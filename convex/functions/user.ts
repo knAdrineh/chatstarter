@@ -1,14 +1,16 @@
-import { internalMutation, MutationCtx,query, QueryCtx } from "../_generated/server";
+import {
+  internalMutation,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from "../_generated/server";
 import { v } from "convex/values";
 
-
-export const get = query( {
-  handler : async (ctx) =>  {
+export const get = query({
+  handler: async (ctx) => {
     return await getCurrentUser(ctx);
-  }
-  }
-
-)
+  },
+});
 export const upsert = internalMutation({
   args: {
     username: v.string(),
@@ -42,16 +44,19 @@ export const remove = internalMutation({
   },
 });
 
-const getUserByClerkId = async (ctx : QueryCtx | MutationCtx, clerkId : string) =>{
+const getUserByClerkId = async (
+  ctx: QueryCtx | MutationCtx,
+  clerkId: string
+) => {
   return await ctx.db
     .query("users")
     .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
     .unique();
 };
 
-const getCurrentUser = async (ctx : QueryCtx | MutationCtx) => {
+export const getCurrentUser = async (ctx: QueryCtx | MutationCtx) => {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity){
+  if (!identity) {
     return null;
   }
   return await getUserByClerkId(ctx, identity.subject);
